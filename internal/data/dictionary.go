@@ -8,6 +8,7 @@ import (
 	"io"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 //go:embed words.txt
@@ -19,6 +20,12 @@ var quoteBytes []byte
 type Quote struct {
 	Author string
 	Text   string
+}
+
+type Stats struct {
+	RawWPM float64
+	NetWPM float64
+	Acc    float64
 }
 
 func GetRandomWords(num int) ([]string, error) {
@@ -59,3 +66,24 @@ func GetRandomQuote() (Quote, error) {
 
 	return quotes[rand.Intn(len(quotes))], nil
 }
+
+func GetStats(totalTyped int, mistakes int, elapsed time.Duration) (Stats, error) {
+	if mistakes < 0 || mistakes > totalTyped {
+		return Stats{}, errors.New("More mistakes than total typed")
+	}
+
+	if elapsed <= 0 {
+		return Stats{}, errors.New("elapsed time must be > 0")
+	}
+
+	if totalTyped == 0 {
+		return Stats{RawWPM: 0, NetWPM: 0, Acc: 0}, nil
+	}
+
+	rawWPM := float64(totalTyped/5) / elapsed.Seconds()
+	netWPM := rawWPM - (float64(mistakes) / elapsed.Seconds())
+	acc := float64(totalTyped-mistakes) / float64(totalTyped)
+
+	return Stats{RawWPM: rawWPM, NetWPM: netWPM, Acc: acc}, nil
+}
+
