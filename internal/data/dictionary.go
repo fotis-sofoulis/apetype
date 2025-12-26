@@ -18,7 +18,7 @@ var quoteBytes []byte
 
 type Quote struct {
 	Author string
-	Text string
+	Text   string
 }
 
 func GetRandomWords(num int) ([]string, error) {
@@ -33,8 +33,8 @@ func GetRandomQuote() (Quote, error) {
 	r := csv.NewReader(bytes.NewReader(quoteBytes))
 
 	if _, err := r.Read(); err != nil && err != io.EOF {
-        return Quote{}, err
-    }
+		return Quote{}, err
+	}
 
 	var quotes []Quote
 	for {
@@ -48,7 +48,7 @@ func GetRandomQuote() (Quote, error) {
 		if len(record) >= 2 {
 			quotes = append(quotes, Quote{
 				Author: record[0],
-				Text: record[1],
+				Text:   record[1],
 			})
 		}
 	}
